@@ -31,7 +31,6 @@
             _controlPanel = new Panel();
             _hintLabel = new Label();
             _titleLabel = new Label();
-            _subtitleLabel = new Label();
             _langChangerButton = new Button();
             _minesLabel = new Label();
             _difficultyComboBox = new ComboBox();
@@ -44,7 +43,6 @@
             // 
             _controlPanel.Controls.Add(_hintLabel);
             _controlPanel.Controls.Add(_titleLabel);
-            _controlPanel.Controls.Add(_subtitleLabel);
             _controlPanel.Controls.Add(_langChangerButton);
             _controlPanel.Controls.Add(_minesLabel);
             _controlPanel.Controls.Add(_difficultyComboBox);
@@ -70,17 +68,9 @@
             _titleLabel.TabIndex = 5;
             _titleLabel.Text = "Minesweeper";
             // 
-            // _subtitleLabel
-            // 
-            _subtitleLabel.Location = new Point(24, 50);
-            _subtitleLabel.Name = "_subtitleLabel";
-            _subtitleLabel.Size = new Size(360, 24);
-            _subtitleLabel.TabIndex = 4;
-            _subtitleLabel.Text = "A cleaner, lighter interface for the classic minefield.";
-            // 
             // _langChangerButton
             // 
-            _langChangerButton.Location = new Point(388, 88);
+            _langChangerButton.Location = new Point(388, 60);
             _langChangerButton.Name = "_langChangerButton";
             _langChangerButton.Size = new Size(76, 36);
             _langChangerButton.TabIndex = 3;
@@ -98,8 +88,9 @@
             // 
             // _difficultyComboBox
             // 
+            _difficultyComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             _difficultyComboBox.FormattingEnabled = true;
-            _difficultyComboBox.Location = new Point(24, 88);
+            _difficultyComboBox.Location = new Point(24, 60);
             _difficultyComboBox.Name = "_difficultyComboBox";
             _difficultyComboBox.Size = new Size(220, 23);
             _difficultyComboBox.TabIndex = 0;
@@ -107,7 +98,7 @@
             // 
             // _newGameButton
             // 
-            _newGameButton.Location = new Point(256, 88);
+            _newGameButton.Location = new Point(256, 60);
             _newGameButton.Name = "_newGameButton";
             _newGameButton.Size = new Size(120, 36);
             _newGameButton.TabIndex = 1;
@@ -145,7 +136,6 @@
         private Panel _controlPanel;
         private Label _hintLabel;
         private Label _titleLabel;
-        private Label _subtitleLabel;
         private Button _langChangerButton;
         private Label _minesLabel;
         private ComboBox _difficultyComboBox;

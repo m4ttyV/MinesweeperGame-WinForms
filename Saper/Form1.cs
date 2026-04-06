@@ -91,9 +91,6 @@ namespace Saper
             _titleLabel.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold, GraphicsUnit.Point);
             _titleLabel.ForeColor = Color.FromArgb(29, 37, 53);
 
-            _subtitleLabel.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point);
-            _subtitleLabel.ForeColor = Color.FromArgb(107, 114, 128);
-
             _hintLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             _hintLabel.ForeColor = Color.FromArgb(107, 114, 128);
 
@@ -558,32 +555,26 @@ namespace Saper
             _titleLabel.Location = new Point(24, 18);
             _titleLabel.Size = new Size(_controlPanel.Width - 220, 34);
 
-            _subtitleLabel.Location = new Point(24, 50);
-            _subtitleLabel.Size = new Size(_controlPanel.Width - 240, 24);
-
-            _difficultyComboBox.Location = new Point(24, 88);
+            _difficultyComboBox.Location = new Point(24, 65);
             _difficultyComboBox.Size = new Size(220, 36);
 
-            _newGameButton.Location = new Point(_difficultyComboBox.Right + 12, 88);
+            _newGameButton.Location = new Point(_difficultyComboBox.Right + 12, 65);
             _newGameButton.Size = new Size(140, 36);
 
-            _langChangerButton.Location = new Point(_newGameButton.Right + 12, 88);
+            _langChangerButton.Location = new Point(_newGameButton.Right + 12, 65);
             _langChangerButton.Size = new Size(76, 36);
 
             _minesLabel.Location = new Point(_controlPanel.Width - 176, 24);
             _minesLabel.Size = new Size(152, 34);
 
-            _hintLabel.Location = new Point(24, 126);
-            _hintLabel.Size = new Size(_controlPanel.Width - 48, 20);
+            _hintLabel.Location = new Point(24, 110);
+            _hintLabel.Size = new Size(_controlPanel.Width - 48, 40);
         }
 
         private void ApplyLocalization()
         {
             Text = eng ? "Minesweeper" : "Сапёр";
             _titleLabel.Text = eng ? "Minesweeper" : "Сапёр";
-            _subtitleLabel.Text = eng
-                ? "A cleaner, lighter interface for the classic minefield."
-                : "Более лёгкий и современный интерфейс для классического минного поля.";
             _hintLabel.Text = eng
                 ? "LMB — open • RMB — flag / chord • Hold LMB on a number to preview neighbours"
                 : "ЛКМ — открыть • ПКМ — флаг / автооткрытие • Удерживай ЛКМ на числе для подсветки";
