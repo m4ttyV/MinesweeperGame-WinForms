@@ -1,27 +1,28 @@
-﻿namespace Saper.Models
+namespace Saper.Models
 {
     public class MinesweeperGame
     {
+        private readonly Random _random = new();
+        private bool _firstClick = true;
+
         public Cell[,] Grid { get; private set; }
         public GameSettings Settings { get; private set; }
-        public GameState State { get; private set; }
         public int RemainingMines { get; private set; }
         public int RevealedCells { get; private set; }
+        public GameState State { get; private set; }
 
-        private bool _firstClick = true;
-        private Random _random = new Random();
-
-        public event Action<Cell> CellRevealed;
-        public event Action<Cell> CellFlagged;
-        public event Action GameWon;
-        public event Action GameLost;
+        public event Action<Cell>? CellRevealed;
+        public event Action<Cell>? CellFlagged;
+        public event Action? GameWon;
+        public event Action? GameLost;
 
         public MinesweeperGame(GameSettings settings)
         {
             Settings = settings;
-            InitializeGrid();
+            RemainingMines = settings.Mines;
             State = GameState.Playing;
-            RemainingMines = Settings.Mines;
+            Grid = new Cell[settings.Rows, settings.Columns];
+            InitializeGrid();
         }
 
         private void InitializeGrid()
@@ -39,12 +40,16 @@
 
         public void RevealCell(int row, int col)
         {
-            if (State != GameState.Playing || row < 0 || row >= Settings.Rows || col < 0 || col >= Settings.Columns)
+            if (State != GameState.Playing || !IsInside(row, col))
+            {
                 return;
+            }
 
             var cell = Grid[row, col];
             if (cell.IsRevealed || cell.IsFlagged)
+            {
                 return;
+            }
 
             if (_firstClick)
             {
@@ -54,7 +59,9 @@
 
             if (cell.IsMine)
             {
+                cell.IsRevealed = true;
                 State = GameState.Lost;
+                RevealAllMines();
                 GameLost?.Invoke();
                 return;
             }
@@ -68,14 +75,117 @@
             }
         }
 
+        public void RevealAdjacentCellsIfFlagsMatch(int row, int col)
+        {
+            if (State != GameState.Playing || !IsInside(row, col))
+            {
+                return;
+            }
+
+            var cell = Grid[row, col];
+            if (!cell.IsRevealed || cell.AdjacentMines <= 0)
+            {
+                return;
+            }
+
+            int flaggedCount = GetAdjacentFlagCount(row, col);
+            if (flaggedCount != cell.AdjacentMines)
+            {
+                return;
+            }
+
+            foreach (var (adjacentRow, adjacentCol) in GetAdjacentCells(row, col))
+            {
+                var adjacentCell = Grid[adjacentRow, adjacentCol];
+                if (adjacentCell.IsRevealed || adjacentCell.IsFlagged)
+                {
+                    continue;
+                }
+
+                RevealCell(adjacentRow, adjacentCol);
+
+                if (State != GameState.Playing)
+                {
+                    return;
+                }
+            }
+        }
+
+        public void ToggleFlag(int row, int col)
+        {
+            if (State != GameState.Playing || !IsInside(row, col))
+            {
+                return;
+            }
+
+            var cell = Grid[row, col];
+            if (cell.IsRevealed)
+            {
+                return;
+            }
+
+            cell.IsFlagged = !cell.IsFlagged;
+            RemainingMines += cell.IsFlagged ? -1 : 1;
+            CellFlagged?.Invoke(cell);
+        }
+
+        public List<(int Row, int Col)> GetAdjacentCells(int row, int col)
+        {
+            var cells = new List<(int Row, int Col)>();
+
+            for (int r = -1; r <= 1; r++)
+            {
+                for (int c = -1; c <= 1; c++)
+                {
+                    if (r == 0 && c == 0)
+                    {
+                        continue;
+                    }
+
+                    int newRow = row + r;
+                    int newCol = col + c;
+
+                    if (IsInside(newRow, newCol))
+                    {
+                        cells.Add((newRow, newCol));
+                    }
+                }
+            }
+
+            return cells;
+        }
+
+        public int GetAdjacentFlagCount(int row, int col)
+        {
+            if (!IsInside(row, col))
+            {
+                return 0;
+            }
+
+            int count = 0;
+            foreach (var (adjacentRow, adjacentCol) in GetAdjacentCells(row, col))
+            {
+                if (Grid[adjacentRow, adjacentCol].IsFlagged)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
         private void RevealCellRecursive(int row, int col)
         {
-            if (row < 0 || row >= Settings.Rows || col < 0 || col >= Settings.Columns)
+            if (!IsInside(row, col))
+            {
                 return;
+            }
 
             var cell = Grid[row, col];
             if (cell.IsRevealed || cell.IsFlagged)
+            {
                 return;
+            }
 
             cell.IsRevealed = true;
             RevealedCells++;
@@ -83,29 +193,11 @@
 
             if (cell.AdjacentMines == 0)
             {
-                for (int r = -1; r <= 1; r++)
+                foreach (var (adjacentRow, adjacentCol) in GetAdjacentCells(row, col))
                 {
-                    for (int c = -1; c <= 1; c++)
-                    {
-                        if (r == 0 && c == 0) continue;
-                        RevealCellRecursive(row + r, col + c);
-                    }
+                    RevealCellRecursive(adjacentRow, adjacentCol);
                 }
             }
-        }
-
-        public void ToggleFlag(int row, int col)
-        {
-            if (State != GameState.Playing || row < 0 || row >= Settings.Rows || col < 0 || col >= Settings.Columns)
-                return;
-
-            var cell = Grid[row, col];
-            if (cell.IsRevealed)
-                return;
-
-            cell.IsFlagged = !cell.IsFlagged;
-            RemainingMines += cell.IsFlagged ? -1 : 1;
-            CellFlagged?.Invoke(cell);
         }
 
         private void PlaceMines(int safeRow, int safeCol)
@@ -113,7 +205,7 @@
             var safeCells = GetAdjacentCells(safeRow, safeCol);
             safeCells.Add((safeRow, safeCol));
 
-            var availableCells = new List<(int, int)>();
+            var availableCells = new List<(int Row, int Col)>();
 
             for (int row = 0; row < Settings.Rows; row++)
             {
@@ -126,51 +218,32 @@
                 }
             }
 
-            // Перемешиваем и выбираем нужное количество мин
-            var mines = availableCells.OrderBy(x => _random.Next()).Take(Settings.Mines);
+            var mines = availableCells.OrderBy(_ => _random.Next()).Take(Settings.Mines);
 
             foreach (var (row, col) in mines)
             {
                 Grid[row, col].IsMine = true;
-
-                // Обновляем счётчик мин у соседних клеток
                 UpdateAdjacentCounters(row, col);
             }
         }
 
-        private List<(int, int)> GetAdjacentCells(int row, int col)
-        {
-            var cells = new List<(int, int)>();
-
-            for (int r = -1; r <= 1; r++)
-            {
-                for (int c = -1; c <= 1; c++)
-                {
-                    int newRow = row + r;
-                    int newCol = col + c;
-
-                    if (newRow >= 0 && newRow < Settings.Rows && newCol >= 0 && newCol < Settings.Columns)
-                    {
-                        cells.Add((newRow, newCol));
-                    }
-                }
-            }
-
-            return cells;
-        }
-
         private void UpdateAdjacentCounters(int mineRow, int mineCol)
         {
-            for (int r = -1; r <= 1; r++)
+            foreach (var (row, col) in GetAdjacentCells(mineRow, mineCol))
             {
-                for (int c = -1; c <= 1; c++)
-                {
-                    int row = mineRow + r;
-                    int col = mineCol + c;
+                Grid[row, col].AdjacentMines++;
+            }
+        }
 
-                    if (row >= 0 && row < Settings.Rows && col >= 0 && col < Settings.Columns)
+        private void RevealAllMines()
+        {
+            for (int row = 0; row < Settings.Rows; row++)
+            {
+                for (int col = 0; col < Settings.Columns; col++)
+                {
+                    if (Grid[row, col].IsMine)
                     {
-                        Grid[row, col].AdjacentMines++;
+                        Grid[row, col].IsRevealed = true;
                     }
                 }
             }
@@ -180,7 +253,13 @@
         {
             return RevealedCells == (Settings.Rows * Settings.Columns - Settings.Mines);
         }
+
+        private bool IsInside(int row, int col)
+        {
+            return row >= 0 && row < Settings.Rows && col >= 0 && col < Settings.Columns;
+        }
     }
+
     public enum GameState
     {
         Playing,
