@@ -4,6 +4,8 @@ A desktop implementation of the classic Minesweeper game written in **C#** and *
 
 The project separates core game logic from UI state and presentation using an MVVM-inspired structure. It includes multiple difficulty levels, first-click protection, flagging, chord opening, localization, and a custom modernized WinForms interface.
 
+![Minesweeper screenshot](Saper/docs/screenshots/game.png)
+
 ## Features
 
 - Classic Minesweeper gameplay
@@ -242,4 +244,3 @@ Then build and run the project.
 
 This project is currently provided for demonstration and educational purposes.
 
-![Minesweeper screenshot](Saper/docs/screenshots/game.png)
