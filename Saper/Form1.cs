@@ -54,7 +54,7 @@ namespace Saper
         private static Dictionary<int, string> LoadMessages(string languageFolder, string fileName)
         {
             var result = new Dictionary<int, string>();
-            var path = Path.Combine(AppContext.BaseDirectory, "Recources", languageFolder, fileName);
+            var path = Path.Combine(AppContext.BaseDirectory, "Resources", languageFolder, fileName);
 
             if (!File.Exists(path))
             {
