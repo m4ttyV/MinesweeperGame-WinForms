@@ -171,7 +171,7 @@ MinesweeperGame-WinForms/
     │   ├── ObservableObject.cs
     │   └── RelayCommand.cs
     │
-    ├── Recources/
+    ├── Resources/
     │   ├── En/
     │   └── Ru/
     │
@@ -241,3 +241,5 @@ Then build and run the project.
 ## License
 
 This project is currently provided for demonstration and educational purposes.
+
+![Minesweeper screenshot](docs/screenshots/game.png)
