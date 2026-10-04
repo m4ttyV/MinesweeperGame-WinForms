@@ -242,4 +242,4 @@ Then build and run the project.
 
 This project is currently provided for demonstration and educational purposes.
 
-![Minesweeper screenshot](docs/screenshots/game.png)
+![Minesweeper screenshot](Saper/docs/screenshots/game.png)
